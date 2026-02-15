@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { parseIRCMessage } from '../utils/ircParser';
 
 export const GlobalChat = () => {
+    // Vercel build fix verified
     const [messages, setMessages] = useState<any[]>([]);
     const [ircUserCount, setIrcUserCount] = useState(0);
     const [onlineUserCount, setOnlineUserCount] = useState(0);
