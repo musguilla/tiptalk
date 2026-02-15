@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Heart, User, Sparkles } from 'lucide-react';
+import { MessageCircle, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuthStore } from '../store/useAuthStore';
 import { parseIRCMessage } from '../utils/ircParser';
 
 export const GlobalChat = () => {
     const [messages, setMessages] = useState<any[]>([]);
     const [ircUserCount, setIrcUserCount] = useState(0);
     const [onlineUserCount, setOnlineUserCount] = useState(0);
-    const { user } = useAuthStore();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -18,14 +16,13 @@ export const GlobalChat = () => {
                 .from('messages')
                 .select('*, profiles(username, avatar_url)')
                 .eq('channel_id', 'general')
-                .order('created_at', { descending: false })
+                .order('created_at', { ascending: true })
                 .limit(20);
 
             if (data) setMessages(data);
         };
         fetchMessages();
-
-        // Subscribe to general room
+        // ... (rest of the useEffect body)
         const channel = supabase.channel('room:general');
 
         channel
@@ -75,7 +72,6 @@ export const GlobalChat = () => {
                     const ircData = parseIRCMessage(msg.content, msg.profiles?.username || 'Unknown');
                     const displayNick = ircData.isIRC ? ircData.nick : (msg.profiles?.username || 'Guest');
                     const displayMsg = ircData.isIRC ? ircData.message : msg.content;
-                    const isBridge = msg.profiles?.username === 'IRC Bridge';
 
                     if (msg.is_tip) {
                         return (
