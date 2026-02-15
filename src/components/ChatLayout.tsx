@@ -38,6 +38,27 @@ export const ChatLayout = () => {
             if (data) {
                 setChannelName(data.name);
                 setChannelDesc(data.description || '');
+            } else {
+                console.log(`[Chat] Channel ${channelId} not found. Auto-creating...`);
+                // Auto-create channel
+                const { error: createError } = await supabase
+                    .from('channels')
+                    .insert({
+                        id: channelId,
+                        name: channelId,
+                        category: 'General',
+                        description: 'Sala de chat creada por usuario',
+                        owner_id: user ? user.id : 'system',
+                        active_users: 0,
+                        is_live: true
+                    });
+
+                if (createError) {
+                    console.error('[Chat] Failed to auto-create channel:', createError);
+                } else {
+                    setChannelName(channelId);
+                    setChannelDesc('Sala de chat creada por usuario');
+                }
             }
         };
 
